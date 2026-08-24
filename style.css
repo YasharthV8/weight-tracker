@@ -1,0 +1,197 @@
+/* Import a modern font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Soft colorful gradient background */
+    background: linear-gradient(135deg, #8cd0f0 0%, #103655 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- Floating Emojis Background Styling --- */
+.bg-emojis {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; 
+    pointer-events: none; 
+}
+
+/* 1. Define the floating animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) var(--rotation, rotate(0deg));
+    }
+    50% {
+        transform: translateY(-25px) var(--rotation, rotate(0deg));
+    }
+}
+
+/* 2. Apply the animation to all emojis */
+.emoji {
+    position: absolute;
+    opacity: 0.4;
+    user-select: none;
+    /* 6 seconds for one full up-and-down cycle, looping infinitely */
+    animation: float 6s ease-in-out infinite; 
+}
+
+/* 3. Position them and stagger the animation timings */
+.e1 { top: 12%; left: 15%; font-size: 4rem; animation-delay: 0s; animation-duration: 7s; }
+.e2 { top: 75%; left: 10%; font-size: 5rem; animation-delay: 1s; animation-duration: 5s; }
+/* Using a CSS variable (--rotation) to keep the tilted look while floating */
+.e3 { top: 18%; right: 20%; font-size: 4rem; --rotation: rotate(15deg); animation-delay: 2s; animation-duration: 8s; }
+.e4 { bottom: 15%; right: 12%; font-size: 4.5rem; animation-delay: 0.5s; animation-duration: 6s; }
+.e5 { top: 45%; left: 5%; font-size: 3rem; animation-delay: 3s; animation-duration: 9s; }
+.e6 { top: 48%; right: 6%; font-size: 6rem; --rotation: rotate(-10deg); animation-delay: 1.5s; animation-duration: 7s; }
+.e7 { top: -2%; left: 45%; font-size: 5rem; opacity: 0.2; animation-delay: 2.5s; animation-duration: 6.5s; }
+
+/* Positioning the emojis statically around the screen */
+.e1 { top: 12%; left: 15%; font-size: 4rem; }
+.e2 { top: 75%; left: 10%; font-size: 5rem; }
+.e3 { top: 18%; right: 20%; font-size: 4rem; transform: rotate(15deg); }
+.e4 { bottom: 15%; right: 12%; font-size: 4.5rem; }
+.e5 { top: 45%; left: 5%; font-size: 3rem; }
+.e6 { top: 48%; right: 6%; font-size: 6rem; transform: rotate(-10deg); }
+.e7 { top: -2%; left: 45%; font-size: 5rem; opacity: 0.2; }
+
+
+/* --- Centered Login Card Styling --- */
+/* --- Split Login Card Styling --- */
+/* --- Translucent Glass Login Card Styling --- */
+.login-container {
+    /* Highly transparent white */
+    background: rgba(255, 255, 255, 0.25); 
+    
+    /* The magic frosted glass effect */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px); /* For Safari support */
+    
+    /* A subtle white border helps the glass effect stand out */
+    border: 1px solid rgba(255, 255, 255, 0.4); 
+    
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 750px; 
+    z-index: 2;
+    display: flex; 
+    overflow: hidden; 
+}
+
+/* Left Side Styling (Logo Area) */
+.login-left {
+    flex: 1; 
+    /* Made this transparent so the glass effect shows through */
+    background: transparent; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    /* Made the divider line semi-transparent */
+    border-right: 1px solid rgba(255, 255, 255, 0.3); 
+}
+
+.brand-logo {
+    width: 100%;
+    max-width: 200px; 
+    height: auto;
+}
+
+.brand-logo {
+    width: 100%;
+    max-width: 200px; /* Optimal logo dimension */
+    height: auto;
+}
+
+/* Right Side Styling (Form Area) */
+.login-right {
+    flex: 1; /* Takes up the other half */
+    padding: 40px;
+    text-align: center;
+}
+
+/* Update header margin for the new layout */
+.login-right h2 {
+    margin-bottom: 25px;
+    color: #000000;
+    font-weight: 600;
+}
+
+/* (Keep your existing .input-group, .btn, and .signup-link CSS exactly the same below this) */
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #000000;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    outline: none;
+    font-size: 1rem;
+    transition: 0.3s border-color ease;
+}
+
+.input-group input:focus {
+    border-color: #764ba2;
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    background: #51519f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s background ease, 0.3s transform ease;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background: #171759;
+    transform: translateY(-2px);
+}
+
+.signup-link {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #000000;
+}
+
+.signup-link a {
+    color: #263766;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
