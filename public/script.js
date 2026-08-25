@@ -43,18 +43,28 @@ function showError(message) {
     errorMessage.style.display = 'block';
 }
 
-function simulateLogin(username) {
-    // Change the button text to show it's working
+async function simulateLogin(username, password) {
     const btn = loginForm.querySelector('.btn');
     btn.innerText = 'Logging in...';
-    btn.style.background = '#4CAF50'; // Change to a success green color
 
-    // Simulate network delay of 1.5 seconds, then alert success
-    setTimeout(() => {
-        alert(`Welcome back, ${username}! Frontend authentication passed.`);
-        // Reset the form
-        loginForm.reset();
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Login successful!');
+            window.location.href = '/dashboard.html'; // Redirect on success
+        } else {
+            showError(data.message || 'Login failed');
+            btn.innerText = 'Login';
+        }
+    } catch (error) {
+        showError('Server error. Please try again.');
         btn.innerText = 'Login';
-        btn.style.background = '#764ba2';
-    }, 1500);
+    }
 }
