@@ -95,6 +95,8 @@ body {
 
 /* Left Side Styling (Logo Area) */
 .login-left {
+    gap: 12%;
+    flex-direction: column;
     flex: 1; 
     /* Made this transparent so the glass effect shows through */
     background: transparent; 
@@ -110,6 +112,11 @@ body {
     width: 100%;
     max-width: 200px; 
     height: auto;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: bolder;
 }
 
 .brand-logo {
