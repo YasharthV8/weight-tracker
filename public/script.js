@@ -2,6 +2,7 @@
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
 const errorMessage = document.getElementById('error-message');
+const logoutLink = document.querySelector('.logout-link');
 
 // Added these two missing variables!
 const weightForm = document.getElementById('weight-form');
@@ -164,5 +165,18 @@ if (weightForm) {
             alert('Server error');
         }
         btn.innerText = 'Save Entry';
+    });
+}
+// --- LOGOUT LOGIC ---
+if (logoutLink) {
+    logoutLink.addEventListener('click', function(event) {
+        // Stop the link from redirecting immediately
+        event.preventDefault(); 
+        
+        // 1. Delete the user's session from the browser
+        localStorage.removeItem('currentUser');
+        
+        // 2. Send them back to the login page
+        window.location.href = '/index.html';
     });
 }
