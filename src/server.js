@@ -7,6 +7,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+const weightRoutes = require('./routes/weightRoutes');
+app.use('/api/weights', weightRoutes);
 
 // Export the app for Vercel
 module.exports = app;
