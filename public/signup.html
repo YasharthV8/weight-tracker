@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weight-Tracker</title>
+    <title>Sign Up - Weight-Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Static Background Emojis -->
+    <!-- Same Background Emojis -->
     <div class="bg-emojis">
         <span class="emoji e1">🏋️</span>
         <span class="emoji e2">💪</span>
@@ -18,31 +18,30 @@
         <span class="emoji e7">💪</span>
     </div>
 
-    <!-- Centered Login Card with Logo on Left -->
     <div class="login-container">
-        <!-- Left Side: Logo -->
         <div class="login-left">
-            <!-- Replace 'logo.png' with your actual logo file -->
              <span class="brand-name">Weight-Tracker</span>
             <img src="weight.png" alt="Brand Logo" class="brand-logo">
         </div>
 
-        <!-- Right Side: Login Options -->
         <div class="login-right">
-            <h2>Welcome Back</h2>
-            <form id="login-form">
+            <h2>Create Account</h2>
+            <!-- Notice the ID is now signup-form -->
+            <form id="signup-form">
                 <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" required>
+                    <label for="new-username">Choose Username</label>
+                    <input type="text" id="new-username" placeholder="3-15 characters" required>
                 </div>
                 <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <label for="new-password">Choose Password</label>
+                    <input type="password" id="new-password" placeholder="Must include symbol & number" required>
                 </div>
                 <p id="error-message" style="color: #ff6b6b; font-size: 0.85rem; margin-bottom: 10px; display: none;"></p>
-                <button type="submit" class="btn">Login</button>
+                
+                <button type="submit" class="btn">Sign Up</button>
             </form>
-            <p class="signup-link">Don't have an account? <a href="signup.html">Sign up here</a></p>
+            <!-- This link takes them back to the login page -->
+            <p class="signup-link">Already have an account? <a href="index.html">Login here</a></p>
         </div>
     </div>
     <script src="script.js"></script>
