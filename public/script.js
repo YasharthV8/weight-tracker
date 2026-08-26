@@ -98,7 +98,37 @@ if (signupForm) {
 }
 
 // --- DASHBOARD LOGIC ---
+
 if (weightForm) {
+    // 1. Fetch history immediately when page loads
+    async function loadHistory() {
+        const username = localStorage.getItem('currentUser');
+        if (!username) {
+            window.location.href = '/index.html'; // Kick them out if not logged in
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/weights/${username}`);
+            const data = await response.json();
+
+            if (response.ok && data.length > 0) {
+                weightHistory.innerHTML = ''; // Clear the "No weights logged" message
+                
+                data.forEach(entry => {
+                    const date = new Date(entry.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${date}</span> <strong>${entry.weight} kg</strong>`;
+                    weightHistory.appendChild(li);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load history');
+        }
+    }
+
+    // Call the function instantly
+    loadHistory();
     weightForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         

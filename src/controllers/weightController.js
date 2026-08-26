@@ -13,3 +13,17 @@ exports.addWeight = async (req, res) => {
         res.status(500).json({ message: 'Error saving weight' });
     }
 };
+exports.getWeights = async (req, res) => {
+    const { username } = req.params;
+    try {
+        // ORDER BY logged_at DESC ensures the newest entries are at the top
+        const result = await db.query(
+            'SELECT weight, logged_at FROM weights WHERE username = $1 ORDER BY logged_at DESC',
+            [username]
+        );
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching weights' });
+    }
+};
