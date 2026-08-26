@@ -1,7 +1,11 @@
-// Select elements (we use let so they can be null if not on the page)
+// Select elements (we use let/const so they can be null if not on the page)
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
 const errorMessage = document.getElementById('error-message');
+
+// Added these two missing variables!
+const weightForm = document.getElementById('weight-form');
+const weightHistory = document.getElementById('weight-history');
 
 // Regex Patterns
 const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
@@ -9,8 +13,10 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$
 
 // Helper function to show errors
 function showError(message) {
-    errorMessage.innerText = message;
-    errorMessage.style.display = 'block';
+    if (errorMessage) {
+        errorMessage.innerText = message;
+        errorMessage.style.display = 'block';
+    }
 }
 
 // --- LOGIN LOGIC ---
@@ -34,6 +40,7 @@ if (loginForm) {
             const data = await response.json();
 
             if (response.ok) {
+                localStorage.setItem('currentUser', username); 
                 alert('Login successful!');
                 window.location.href = '/dashboard.html';
             } else {
@@ -68,7 +75,6 @@ if (signupForm) {
         btn.innerText = 'Creating account...';
 
         try {
-            // Notice this hits the /signup endpoint!
             const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -79,7 +85,7 @@ if (signupForm) {
 
             if (response.ok) {
                 alert('Account created! You can now log in.');
-                window.location.href = '/index.html'; // Send them to login page
+                window.location.href = '/index.html'; 
             } else {
                 showError(data.message || 'Signup failed');
                 btn.innerText = 'Sign Up';
@@ -92,30 +98,41 @@ if (signupForm) {
 }
 
 // --- DASHBOARD LOGIC ---
-const weightForm = document.getElementById('weight-form');
-const weightHistory = document.getElementById('weight-history');
-
 if (weightForm) {
-    weightForm.addEventListener('submit', function(event) {
+    weightForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         
         const weightInput = document.getElementById('weight').value;
+        const username = localStorage.getItem('currentUser');
+        const btn = weightForm.querySelector('.btn');
         
-        // Get today's date formatted nicely (e.g., Oct 24, 2023)
-        const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        if (!username) return alert('Please log in first!');
+        btn.innerText = 'Saving...';
 
-        // Remove the "No weights logged yet" message if it exists
-        const emptyMsg = document.querySelector('.empty-msg');
-        if (emptyMsg) emptyMsg.remove();
+        try {
+            const response = await fetch('/api/weights/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, weight: weightInput })
+            });
 
-        // Create a new list item
-        const newEntry = document.createElement('li');
-        newEntry.innerHTML = `<span>${date}</span> <strong>${weightInput} kg</strong>`;
+            if (response.ok) {
+                const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                
+                const emptyMsg = document.querySelector('.empty-msg');
+                if (emptyMsg) emptyMsg.remove();
 
-        // Add it to the top of the list
-        weightHistory.prepend(newEntry);
-
-        // Clear the input box
-        weightForm.reset();
+                const newEntry = document.createElement('li');
+                newEntry.innerHTML = `<span>${date}</span> <strong>${weightInput} kg</strong>`;
+                weightHistory.prepend(newEntry);
+                
+                weightForm.reset();
+            } else {
+                alert('Failed to save weight');
+            }
+        } catch (error) {
+            alert('Server error');
+        }
+        btn.innerText = 'Save Entry';
     });
 }
