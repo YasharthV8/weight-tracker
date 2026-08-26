@@ -1,70 +1,121 @@
-// Select our form and input elements
+// Select elements (we use let so they can be null if not on the page)
 const loginForm = document.getElementById('login-form');
-const usernameInput = document.getElementById('username');
-const passwordInput = document.getElementById('password');
+const signupForm = document.getElementById('signup-form');
 const errorMessage = document.getElementById('error-message');
 
-// Define our Regex patterns
-// Username: 3 to 15 characters, only letters, numbers, and underscores
+// Regex Patterns
 const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
-
-// Password: At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-loginForm.addEventListener('submit', function(event) {
-    // Prevent the page from refreshing when clicking submit
-    event.preventDefault();
-
-    const username = usernameInput.value;
-    const password = passwordInput.value;
-
-    // Reset error message
-    errorMessage.style.display = 'none';
-    errorMessage.innerText = '';
-
-    // 1. Validate Username using Regex
-    if (!usernameRegex.test(username)) {
-        showError('Username must be 3-15 characters and contain only letters, numbers, or underscores.');
-        return; // Stop execution if invalid
-    }
-
-    // 2. Validate Password using Regex
-    if (!passwordRegex.test(password)) {
-        showError('Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.');
-        return; 
-    }
-
-    // If both Regex checks pass, simulate a successful login
-    simulateLogin(username);
-});
-
+// Helper function to show errors
 function showError(message) {
     errorMessage.innerText = message;
     errorMessage.style.display = 'block';
 }
 
-async function simulateLogin(username, password) {
-    const btn = loginForm.querySelector('.btn');
-    btn.innerText = 'Logging in...';
+// --- LOGIN LOGIC ---
+if (loginForm) {
+    loginForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const btn = loginForm.querySelector('.btn');
 
-    try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
+        errorMessage.style.display = 'none';
+        btn.innerText = 'Logging in...';
 
-        const data = await response.json();
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
 
-        if (response.ok) {
-            alert('Login successful!');
-            window.location.href = '/dashboard.html'; // Redirect on success
-        } else {
-            showError(data.message || 'Login failed');
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Login successful!');
+                window.location.href = '/dashboard.html';
+            } else {
+                showError(data.message || 'Login failed');
+                btn.innerText = 'Login';
+            }
+        } catch (error) {
+            showError('Server error. Please try again.');
             btn.innerText = 'Login';
         }
-    } catch (error) {
-        showError('Server error. Please try again.');
-        btn.innerText = 'Login';
-    }
+    });
+}
+
+// --- SIGNUP LOGIC ---
+if (signupForm) {
+    signupForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const username = document.getElementById('new-username').value;
+        const password = document.getElementById('new-password').value;
+        const btn = signupForm.querySelector('.btn');
+
+        errorMessage.style.display = 'none';
+
+        // Run Regex Validation
+        if (!usernameRegex.test(username)) {
+            return showError('Username must be 3-15 characters (letters, numbers, underscores).');
+        }
+        if (!passwordRegex.test(password)) {
+            return showError('Password must be 8+ chars, with upper, lower, number, and symbol.');
+        }
+
+        btn.innerText = 'Creating account...';
+
+        try {
+            // Notice this hits the /signup endpoint!
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Account created! You can now log in.');
+                window.location.href = '/index.html'; // Send them to login page
+            } else {
+                showError(data.message || 'Signup failed');
+                btn.innerText = 'Sign Up';
+            }
+        } catch (error) {
+            showError('Server error. Please try again.');
+            btn.innerText = 'Sign Up';
+        }
+    });
+}
+
+// --- DASHBOARD LOGIC ---
+const weightForm = document.getElementById('weight-form');
+const weightHistory = document.getElementById('weight-history');
+
+if (weightForm) {
+    weightForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const weightInput = document.getElementById('weight').value;
+        
+        // Get today's date formatted nicely (e.g., Oct 24, 2023)
+        const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        // Remove the "No weights logged yet" message if it exists
+        const emptyMsg = document.querySelector('.empty-msg');
+        if (emptyMsg) emptyMsg.remove();
+
+        // Create a new list item
+        const newEntry = document.createElement('li');
+        newEntry.innerHTML = `<span>${date}</span> <strong>${weightInput} kg</strong>`;
+
+        // Add it to the top of the list
+        weightHistory.prepend(newEntry);
+
+        // Clear the input box
+        weightForm.reset();
+    });
 }

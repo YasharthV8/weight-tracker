@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Weight-Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Same Background Emojis -->
+    <div class="bg-emojis">
+        <span class="emoji e1">🏋️</span>
+        <span class="emoji e2">💪</span>
+        <span class="emoji e3">🔥</span>
+        <span class="emoji e4">⚖️</span>
+        <span class="emoji e5">🏃</span>
+        <span class="emoji e6">🏋️‍♀️</span>
+        <span class="emoji e7">💪</span>
+    </div>
+
+    <div class="login-container">
+        <div class="login-left">
+             <span class="brand-name">Weight-Tracker</span>
+            <img src="weight.png" alt="Brand Logo" class="brand-logo">
+        </div>
+
+        <div class="login-right">
+            <h2>Create Account</h2>
+            <!-- Notice the ID is now signup-form -->
+            <form id="signup-form">
+                <div class="input-group">
+                    <label for="new-username">Choose Username</label>
+                    <input type="text" id="new-username" placeholder="3-15 characters" required>
+                </div>
+                <div class="input-group">
+                    <label for="new-password">Choose Password</label>
+                    <input type="password" id="new-password" placeholder="Must include symbol & number" required>
+                </div>
+                <p id="error-message" style="color: #ff6b6b; font-size: 0.85rem; margin-bottom: 10px; display: none;"></p>
+                
+                <button type="submit" class="btn">Sign Up</button>
+            </form>
+            <!-- This link takes them back to the login page -->
+            <p class="signup-link">Already have an account? <a href="index.html">Login here</a></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
