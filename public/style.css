@@ -8,45 +8,53 @@
     font-family: 'Poppins', sans-serif;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+/*
+ * Body grows with its content (min-height, not height) so tall pages
+ * scroll normally, while short pages (login/signup) stay vertically centered.
+ */
 body {
-    height: auto;
-    width: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Solid color background */
-    background: #6895ba; 
+    padding: 20px 0;
+    background: #6895ba;
+    overflow-x: hidden;
     overflow-y: auto;
     position: relative;
 }
 
 .outlined-text {
     color: white;
-    
+
     /* 1px outline using shadows on all 4 sides */
-    text-shadow: 
-        -1px -1px 0 #000,  
+    text-shadow:
+        -1px -1px 0 #000,
          1px -1px 0 #000,
         -1px  1px 0 #000,
          1px  1px 0 #000;
 }
 
 /* --- Static & Responsive Emojis Background --- */
+/* Fixed to the viewport so it always fills the screen and never scrolls with the page */
 .bg-emojis {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; 
-    pointer-events: none; 
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
 }
 
 .emoji {
     position: absolute;
     opacity: 0.4;
     user-select: none;
-    /* Animations removed for a static layout */
 }
 
 /* Base positions and sizes for Desktop */
@@ -61,35 +69,36 @@ body {
 
 /* --- Translucent Glass Login Card Styling --- */
 .login-container {
-    background: rgba(255, 255, 255, 0.25); 
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.4); 
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 750px; 
+    max-width: 750px;
+    position: relative;
     z-index: 2;
-    display: flex; 
-    overflow: hidden; 
+    display: flex;
+    overflow: hidden;
 }
 
 /* Left Side Styling (Logo Area) */
 .login-left {
     gap: 12%;
     flex-direction: column;
-    flex: 1; 
-    background: transparent; 
+    flex: 1;
+    background: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 40px;
-    border-right: 1px solid rgba(255, 255, 255, 0.3); 
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .brand-logo {
     width: 100%;
-    max-width: 200px; 
+    max-width: 200px;
     height: auto;
 }
 
@@ -100,7 +109,7 @@ body {
 
 /* Right Side Styling (Form Area) */
 .login-right {
-    flex: 1; 
+    flex: 1;
     padding: 40px;
     text-align: center;
 }
@@ -177,6 +186,7 @@ body {
 .dashboard-wrapper {
     width: 100%;
     max-width: 900px;
+    position: relative;
     z-index: 2;
     padding: 20px;
 }
@@ -185,6 +195,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 20px;
     color: white;
 }
@@ -196,35 +207,42 @@ body {
     background: rgba(255, 255, 255, 0.9);
     padding: 8px 16px;
     border-radius: 8px;
+    white-space: nowrap;
 }
 
+/* Form card + history card, side by side on desktop */
 .dashboard-content {
     display: flex;
+    align-items: stretch;
     gap: 20px;
+    margin-bottom: 20px;
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.25); 
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.4); 
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 15px;
     padding: 30px;
     flex: 1;
+    min-width: 0; /* lets flex children shrink instead of overflowing */
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     color: white;
 }
 
 .glass-card h3 {
     margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     padding-bottom: 10px;
+    font-weight: 600;
 }
 
 .weight-list {
     list-style: none;
     max-height: 300px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .weight-list li {
@@ -234,6 +252,12 @@ body {
     border-radius: 8px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.weight-list li:last-child {
+    margin-bottom: 0;
 }
 
 .empty-msg {
@@ -241,8 +265,41 @@ body {
     opacity: 0.7;
 }
 
+/* --- Weight Trend Chart Card (full width, below the two cards) --- */
+.chart-card {
+    flex: none;
+    width: 100%;
+    padding: 25px;
+}
+
+/* Supports both class names so the markup can use either */
+.chart-container,
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 320px;
+}
+
+.chart-container canvas,
+.chart-wrapper canvas {
+    max-width: 100%;
+}
+
+.chart-container .empty-msg,
+.chart-wrapper .empty-msg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* --- Mobile Responsiveness --- */
 @media (max-width: 768px) {
+    body {
+        padding: 16px 0;
+    }
+
     /* Scale emojis down and push them toward edges so they don't block the mobile card */
     .e1 { font-size: 2.5rem; left: 5%; top: 5%; }
     .e2 { font-size: 3rem; left: 5%; top: 85%; }
@@ -254,73 +311,65 @@ body {
 
     /* Login UI Mobile adjustments */
     .login-container {
-        flex-direction: column; 
-        max-width: 90%; 
+        flex-direction: column;
+        width: calc(100% - 32px);
+        max-width: 480px;
     }
 
     .login-left {
         padding: 20px;
-        border-right: none; 
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3); 
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .brand-logo {
-        max-width: 120px; 
+        max-width: 120px;
     }
 
     .login-right {
-        padding: 25px; 
+        padding: 25px;
     }
 
     .login-right h2 {
-        font-size: 1.5rem; 
+        font-size: 1.5rem;
         margin-bottom: 15px;
     }
 
-    .dashboard-content {
-        flex-direction: column;
-    }
-}
-
-/* Chart Container Glassmorphism Card */
-.chart-card {
-    background: rgba(255, 255, 255, 0.25); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.4); 
-    border-radius: 15px;
-    padding: 25px;
-    margin-top: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    color: white;
-}
-
-.chart-card h3 {
-    margin-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    padding-bottom: 10px;
-    font-weight: 600;
-}
-
-.chart-wrapper {
-    position: relative;
-    height: 320px;
-    width: 100%;
-}
-
-/* Adjust Dashboard Layout for Form + List + Chart */
-.dashboard-content {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-/* Mobile responsiveness adjustments */
-@media (max-width: 768px) {
-    .dashboard-content {
-        flex-direction: column;
+    /* 16px inputs stop iOS from zooming the page on focus */
+    .input-group input {
+        font-size: 16px;
     }
 
+    /* Dashboard: stack the cards and let the page scroll */
+    .dashboard-wrapper {
+        padding: 12px 16px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .dashboard-content {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .glass-card {
+        flex: none;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .chart-card {
+        padding: 20px;
+    }
+
+    .weight-list {
+        max-height: 240px;
+    }
+
+    .chart-container,
     .chart-wrapper {
         height: 250px;
     }
