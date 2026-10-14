@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Weight-Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Background Emojis -->
@@ -42,6 +43,9 @@
                     <!-- JavaScript will add entries here -->
                     <li class="empty-msg">No weights logged yet.</li>
                 </ul>
+            </div>
+            <div class="chart-container" style="position: relative; height:300px; width:100%;">
+                <canvas id="weightChart"></canvas>
             </div>
         </div>
     </div>

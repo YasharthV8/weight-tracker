@@ -4,13 +4,15 @@ const signupForm = document.getElementById('signup-form');
 const errorMessage = document.getElementById('error-message');
 const logoutLink = document.querySelector('.logout-link');
 
-// Added these two missing variables!
 const weightForm = document.getElementById('weight-form');
 const weightHistory = document.getElementById('weight-history');
 
 // Regex Patterns
 const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!\%*?&]{8,}$/;
+
+// Declare global chart instance
+let weightChart = null;
 
 // Helper function to show errors
 function showError(message) {
@@ -28,7 +30,7 @@ if (loginForm) {
         const password = document.getElementById('password').value;
         const btn = loginForm.querySelector('.btn');
 
-        errorMessage.style.display = 'none';
+        if (errorMessage) errorMessage.style.display = 'none';
         btn.innerText = 'Logging in...';
 
         try {
@@ -63,7 +65,7 @@ if (signupForm) {
         const password = document.getElementById('new-password').value;
         const btn = signupForm.querySelector('.btn');
 
-        errorMessage.style.display = 'none';
+        if (errorMessage) errorMessage.style.display = 'none';
 
         // Run Regex Validation
         if (!usernameRegex.test(username)) {
@@ -98,14 +100,13 @@ if (signupForm) {
     });
 }
 
-// --- DASHBOARD LOGIC ---
-
+// --- DASHBOARD & WEIGHT LOGIC ---
 if (weightForm) {
-    // 1. Fetch history immediately when page loads
+    // 1. Fetch history and update list + chart
     async function loadHistory() {
         const username = localStorage.getItem('currentUser');
         if (!username) {
-            window.location.href = '/index.html'; // Kick them out if not logged in
+            window.location.href = '/index.html'; // Kick out unauthenticated user
             return;
         }
 
@@ -114,22 +115,33 @@ if (weightForm) {
             const data = await response.json();
 
             if (response.ok && data.length > 0) {
-                weightHistory.innerHTML = ''; // Clear the "No weights logged" message
-                
-                data.forEach(entry => {
-                    const date = new Date(entry.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span>${date}</span> <strong>${entry.weight} kg</strong>`;
-                    weightHistory.appendChild(li);
-                });
+                if (weightHistory) {
+                    weightHistory.innerHTML = ''; // Clear "No weights logged" message
+                    
+                    data.forEach(entry => {
+                        const date = new Date(entry.logged_at || entry.date || entry.created_at).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                        });
+                        const li = document.createElement('li');
+                        li.innerHTML = `<span>${date}</span> <strong>${entry.weight} kg</strong>`;
+                        weightHistory.appendChild(li);
+                    });
+                }
+
+                // Update Chart with retrieved data
+                updateWeightChart(data);
             }
         } catch (error) {
-            console.error('Failed to load history');
+            console.error('Failed to load history:', error);
         }
     }
 
-    // Call the function instantly
+    // Initialize data load on page load
     loadHistory();
+
+    // Handle Form Submit
     weightForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         
@@ -148,16 +160,9 @@ if (weightForm) {
             });
 
             if (response.ok) {
-                const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                
-                const emptyMsg = document.querySelector('.empty-msg');
-                if (emptyMsg) emptyMsg.remove();
-
-                const newEntry = document.createElement('li');
-                newEntry.innerHTML = `<span>${date}</span> <strong>${weightInput} kg</strong>`;
-                weightHistory.prepend(newEntry);
-                
                 weightForm.reset();
+                // Refresh list and chart automatically
+                await loadHistory();
             } else {
                 alert('Failed to save weight');
             }
@@ -167,16 +172,73 @@ if (weightForm) {
         btn.innerText = 'Save Entry';
     });
 }
+
 // --- LOGOUT LOGIC ---
 if (logoutLink) {
     logoutLink.addEventListener('click', function(event) {
-        // Stop the link from redirecting immediately
         event.preventDefault(); 
-        
-        // 1. Delete the user's session from the browser
         localStorage.removeItem('currentUser');
-        
-        // 2. Send them back to the login page
         window.location.href = '/index.html';
+    });
+}
+
+// --- CHART RENDERING FUNCTION ---
+function updateWeightChart(weightLogs) {
+    const canvas = document.getElementById('weightChart');
+    if (!canvas) return;
+
+    // Sort logs chronologically ascending
+    const sortedLogs = [...weightLogs].sort(
+        (a, b) => new Date(a.logged_at || a.date || a.created_at) - new Date(b.logged_at || b.date || b.created_at)
+    );
+
+    const labels = sortedLogs.map(log => 
+        new Date(log.logged_at || log.date || log.created_at).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric'
+        })
+    );
+    const data = sortedLogs.map(log => log.weight);
+
+    // Destroy existing instance to avoid canvas overlay bugs
+    if (weightChart) {
+        weightChart.destroy();
+    }
+
+    const ctx = canvas.getContext('2d');
+    weightChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Weight (kg)',
+                data: data,
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                borderWidth: 2,
+                pointBackgroundColor: '#4f46e5',
+                pointRadius: 4,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    title: { display: true, text: 'Date' }
+                },
+                y: {
+                    title: { display: true, text: 'Weight (kg)' },
+                    beginAtZero: false
+                }
+            }
+        }
     });
 }
